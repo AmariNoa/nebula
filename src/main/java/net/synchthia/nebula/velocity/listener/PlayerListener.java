@@ -124,12 +124,11 @@ public class PlayerListener {
     public void onServerDisconnected(DisconnectEvent event) {
         Set<NebulaProtos.PlayerProperty> properties = plugin.getPlayerAPI().profileToProperties(event.getPlayer().getGameProfile());
 
-        Optional<ServerConnection> previousServer = event.getPlayer().getCurrentServer();
-        previousServer.ifPresent(registeredServer -> plugin.getPlayerAPI().requestPlayerQuit(NebulaProtos.PlayerProfile.newBuilder()
+        plugin.getPlayerAPI().requestPlayerQuit(NebulaProtos.PlayerProfile.newBuilder()
                 .setPlayerUUID(event.getPlayer().getUniqueId().toString())
                 .setPlayerName(event.getPlayer().getUsername())
                 .setPlayerLatency(event.getPlayer().getPing())
                 .addAllProperties(properties)
-                .build()));
+                .build());
     }
 }

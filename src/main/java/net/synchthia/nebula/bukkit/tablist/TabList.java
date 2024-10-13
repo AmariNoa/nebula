@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import net.synchthia.nebula.api.player.PlayerProperty;
 import net.synchthia.nebula.bukkit.NebulaPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -97,6 +98,10 @@ public class TabList {
         }));
     }
 
+    public void onPlayerGameModeChange(Player player) {
+        addPlayer(tabListEntries.get(player.getUniqueId()));
+    }
+
     public void syncTabList(Player player) {
         sendRemoveAllPacket(player);
         for (TabListEntry entry : tabListEntries.values()) {
@@ -160,11 +165,17 @@ public class TabList {
             wrappedGameProfile.getProperties().put(p.getName(), v);
         }
 
+        Player targetPlayer = plugin.getServer().getPlayer(entry.getUuid());
+        EnumWrappers.NativeGameMode targetGameMode =
+                (targetPlayer != null && targetPlayer.isOnline())
+                        ? EnumWrappers.NativeGameMode.valueOf(targetPlayer.getGameMode().name())
+                        : EnumWrappers.NativeGameMode.valueOf(Bukkit.getDefaultGameMode().name());
+
         playerInfoPacket.getPlayerInfoDataLists().write(1, List.of(new PlayerInfoData(
                 entry.getUuid(),
                 0,
                 true,
-                EnumWrappers.NativeGameMode.CREATIVE,
+                targetGameMode,
                 wrappedGameProfile,
                 WrappedChatComponent.fromText(entry.getName()),
                 chatSession)
